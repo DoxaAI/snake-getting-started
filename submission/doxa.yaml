@@ -1,0 +1,4 @@
+competition: snake
+environment: cpu
+language: python
+entrypoint: agent.py
