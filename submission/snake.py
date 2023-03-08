@@ -36,8 +36,33 @@ class SnakeGameRunner:
     def __init__(self, agent: BaseAgent) -> None:
         self.agent = agent
 
+    def _handle_initialisation(self):
+        message = input().strip()
+        assert message == "INIT"
+
+        print("OK")
+
     async def run(self):
-        pass
+        self._handle_initialisation()
+
+        while True:
+            message = input().strip().split(" ")
+
+            # initialisation of the fruit / snake
+            if message[0] == "I":
+                pass
+
+            # request a move
+            elif message[0] == "M":
+                pass
+
+            # updates
+            elif message[0] == "U":
+                pass
+
+            # unknown messages
+            else:
+                raise ValueError("Unknown command.")
 
 
 def main(agent: BaseAgent):
