@@ -38,6 +38,18 @@ class BaseAgent:
         self.direction = direction
         self.cells = cells
 
+    async def make_move(self, board: List[List[CellState]]) -> Action:
+        """Makes a move.
+
+        Args:
+            board (List[List[CellState]]): The current state of the board.
+
+        Returns:
+            Action: The action to take.
+        """
+
+        raise NotImplementedError()
+
 
 class SnakeGameRunner:
     def __init__(self, agent: BaseAgent) -> None:
@@ -79,62 +91,32 @@ class SnakeGameRunner:
                 for cell in self.snake[1:]:
                     self.board[cell[0]][cell[1]] = CellState.TAIL
 
-                print("".join([f"{x}{y} " for x,y in self.snake]))
-                print(f"{fruit[0]}{fruit[1]}")
-
             # request a move
             elif message[0] == "M":
-                self.direction = await self.agent.make_move()
-                
-                # Determine head coords
-                x, y = self.snake[-1][:]
-
-                # Calc new head coords
-                if self.direction == Action.UP:
-                    x -= 1
-                elif self.direction == Action.DOWN:
-                    x += 1
-                elif self.direction == Action.RIGHT:
-                    y += 1
-                elif self.direction == Action.LEFT:
-                    y -= 1
-
-                # Wrap the board
-                head = self._wrap_cell((x, y))
-
-                self.board[self.snake[0][0]][self.snake[0][1]] = CellState.EMPTY
-                self.board[self.snake[-1][0]][self.snake[-1][1]] = CellState.TAIL
-                self.board[head[0]][head[1]] = CellState.HEAD
-                
-                self.snake.append(head)
-                del self.snake[0]
-
-                print(self.direction)
+                move = await self.agent.make_move(self.board)
+                print(move.value) 
 
             # updates
             elif message[0] == "U":
-                head = message[1]
+                
+                head_x = int(message[1])
+                head_y = int(message[2])
 
-                # Update the board
-                self.board[self.snake[0][0]][self.snake[0][1]] = CellState.EMPTY
+                if len(message) == 5:
+                    fruit_x = int(message[3])
+                    fruit_y = int(message[4])
+
+                    self.board[fruit_x][fruit_y] = CellState.FRUIT                    
+                    self.fruit = (fruit_x, fruit_y)
+
+                else:
+                    self.board[self.snake[0][0]][self.snake[0][1]] = CellState.EMPTY
+                    self.snake.pop(0)
+
                 self.board[self.snake[-1][0]][self.snake[-1][1]] = CellState.TAIL
-                self.board[head[0]][head[1]] = CellState.HEAD
+                self.board[head_x][head_y] = CellState.HEAD
+                self.snake.append((head_x, head_y))
 
-                print(f"{head[0]} {head[1]} ")
-
-                if len(message) == 3:
-                    tail = message[2]
-                    fruit = message[3]
-
-                    #update board
-                    self.board[tail[0]][tail[1]] = CellState.TAIL
-                    self.board[fruit[0]][fruit[1]] = CellState.FRUIT
-                    
-                    #update snake and fruit
-                    self.snake.append(tail)
-                    self.fruit = fruit
-
-                    print(f"{tail[0]} {tail[1]} {fruit[0]} {fruit[1]} ")
                 
             # unknown messages
             else:

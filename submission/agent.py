@@ -1,7 +1,7 @@
 import random
 from typing import List
 
-from snake import Action, BaseAgent, main
+from snake import Action, BaseAgent, main, CellState
 
 #################################################################
 #   Modify the Agent class below to implement your own agent.   #
@@ -12,10 +12,10 @@ from snake import Action, BaseAgent, main
 class Agent(BaseAgent):
     """An agent for the snake competition on DOXA."""
 
-    def make_move(self, board: List[List[str]]) -> Action:
+    async def make_move(self, board: List[List[CellState]]) -> Action:
         """Makes a move.
         Args:
-            board (List[List[str]]): The current state of the board.
+            board (List[List[CellState]]): The current state of the board.
         Returns:
             Tuple[Tuple[int, int], str]: The coordinates of the head and direction of the snake.
         """

@@ -191,7 +191,7 @@ class SnakeGame:
         self.agent = agent
         self.board = Board(BOARD_SIZE, seed)
 
-    def _request_move(self) -> str:
+    async def _request_move(self) -> str:
         """Request a move from the agent.
 
         Returns:
@@ -200,7 +200,7 @@ class SnakeGame:
 
         self.agent.update(self.board.direction, self.board.snake)
 
-        return self.agent.make_move(self.board.board)
+        return await self.agent.make_move(self.board.board)
 
     def initialise(self) -> Tuple[Tuple[int, int], Tuple[int, int]]:
         self.board.spawn_snake(SPAWNING_CELLS)
@@ -208,7 +208,7 @@ class SnakeGame:
 
         return self.board.snake, fruit
 
-    def play(self) -> None:
+    async def run(self) -> None:
         """Plays a game of snake."""
 
         try:
@@ -216,7 +216,7 @@ class SnakeGame:
                 fruit = None
                 tail = None
 
-                direction = self._request_move()
+                direction = await self._request_move()
                 head = self.board.move(direction)
 
                 # check if snake eats a fruit

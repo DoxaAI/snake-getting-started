@@ -28,13 +28,13 @@ class SnakeCLI:
 
         size = self.game.board.size
 
-        for _ in self.game.play():
+        async for _ in self.game.run():
             # Render snake on the board
             os.system(CLEAR_COMMAND)
             for i in range(size):
                 print(" ".join(self.icons[c] for c in self.game.board.board[i]))
 
-            time.sleep(0.01)
+            time.sleep(1)
 
 
 async def main():
