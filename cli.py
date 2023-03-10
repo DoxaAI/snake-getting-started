@@ -18,8 +18,8 @@ class SnakeCLI:
 
         self.icons = {
             0: " . ",
-            1: " * ",
-            2: " # ",
+            1: " ■ ",
+            2: " □ ",
             3: " & ",
         }
 
@@ -34,7 +34,7 @@ class SnakeCLI:
             for i in range(size):
                 print(" ".join(self.icons[c] for c in self.game.board.board[i]))
 
-            time.sleep(0.4)
+            time.sleep(0.25)
 
 
 async def main():

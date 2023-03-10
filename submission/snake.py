@@ -12,6 +12,7 @@ class Action(IntEnum):
     DOWN = 2
     LEFT = 3
 
+
 class CellState(IntEnum):
     EMPTY = 0
     TAIL = 1
@@ -54,7 +55,9 @@ class BaseAgent:
 class SnakeGameRunner:
     def __init__(self, agent: BaseAgent) -> None:
         self.agent = agent
-        self.board = [[CellState.EMPTY for j in range(BOARD_SIZE)] for i in range(BOARD_SIZE)]
+        self.board = [
+            [CellState.EMPTY for j in range(BOARD_SIZE)] for i in range(BOARD_SIZE)
+        ]
 
     def _handle_initialisation(self):
         message = input().strip()
@@ -62,30 +65,22 @@ class SnakeGameRunner:
 
         print("OK")
 
-    def _wrap_cell(self, point: Tuple[int, int]) -> Tuple[int, int]:
-        """Not a very useful comment.
-
-        Args:
-            point (Tuple[int, int]): TODO
-
-        Returns:
-            Tuple[int, int]: TODO
-        """
-
-        return (point[0] % self.size, point[1] % self.size)
-
     async def run(self):
         self._handle_initialisation()
 
         while True:
             message = input().strip().split(" ")
 
-            # initialisation of the fruit / snake
+            # board initialisation
             if message[0] == "I":
-                self.snake = [(int(message[i]), int(message[i+1])) for i in range(1, len(message) - 2, 2)]
-                self.fruit = (int(message[-2]), int(message[-1]))
+                # fruit
+                self.fruit = (int(message[1]), int(message[2]))
 
-                #game logic
+                # initial snake position
+                points = iter(message[3:])
+                self.snake = [(int(a), int(b)) for a, b in zip(points, points)]
+
+                # game logic
                 self.board[self.fruit[0]][self.fruit[1]] = CellState.FRUIT
                 self.board[self.snake[0][0]][self.snake[0][1]] = CellState.HEAD
                 for cell in self.snake[1:]:
@@ -94,11 +89,10 @@ class SnakeGameRunner:
             # request a move
             elif message[0] == "M":
                 move = await self.agent.make_move(self.board)
-                print(move.value) 
+                print(move.value)
 
             # updates
             elif message[0] == "U":
-                
                 head_x = int(message[1])
                 head_y = int(message[2])
 
@@ -106,9 +100,8 @@ class SnakeGameRunner:
                     fruit_x = int(message[3])
                     fruit_y = int(message[4])
 
-                    self.board[fruit_x][fruit_y] = CellState.FRUIT                    
+                    self.board[fruit_x][fruit_y] = CellState.FRUIT
                     self.fruit = (fruit_x, fruit_y)
-
                 else:
                     self.board[self.snake[0][0]][self.snake[0][1]] = CellState.EMPTY
                     self.snake.pop(0)
@@ -117,7 +110,6 @@ class SnakeGameRunner:
                 self.board[head_x][head_y] = CellState.HEAD
                 self.snake.append((head_x, head_y))
 
-                
             # unknown messages
             else:
                 raise ValueError("Unknown command.")
