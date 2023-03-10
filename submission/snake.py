@@ -46,7 +46,7 @@ class BaseAgent:
             board (List[List[CellState]]): The current state of the board.
 
         Returns:
-            Action: The action to take.
+            Action: The direction in which the snake will mvoe next. eg. Action.UP
         """
 
         raise NotImplementedError()
@@ -60,12 +60,16 @@ class SnakeGameRunner:
         ]
 
     def _handle_initialisation(self):
+        """Handles the initialisation of the game.
+        """
         message = input().strip()
         assert message == "INIT"
 
         print("OK")
 
     async def run(self):
+        """Runs the game.
+        """
         self._handle_initialisation()
 
         while True:

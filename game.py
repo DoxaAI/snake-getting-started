@@ -28,23 +28,30 @@ class CellState(IntEnum):
 
 class Board:
     def __init__(self, size, seed=None):
+        """Initialise the board.
+        Args:
+            size (int): The size of the board.
+            seed (int, optional): The seed for the random number generator. Defaults to None.
+        """
+        
         self.rng = Random(seed)
-
         self.size = size
-
         self.direction = Action.RIGHT
         self.snake = [(0, 0), (0, 1), (0, 2), (0, 3)]  # tail to head
-
         self.fruit = None
-
         self._clear_board()
 
     def _clear_board(self):
+        """Clear the board."""
         self.board = [
             [CellState.EMPTY for j in range(self.size)] for i in range(self.size)
         ]
 
     def spawn_snake(self, cells: List[Tuple[int, int]]) -> None:
+        """Spawn the snake.
+        Args:
+            cells (List[Tuple[int, int]]): The cells that make up the snake.
+        """
         self.snake = cells[:]
 
         self.board[cells[-1][0]][cells[-1][1]] = CellState.HEAD
@@ -52,6 +59,10 @@ class Board:
             self.board[cell[0]][cell[1]] = CellState.TAIL
 
     def spawn_fruit(self) -> Tuple[int, int]:
+        """Spawn a fruit.
+        Returns:
+            Tuple[int, int]: The coordinates of the fruit.
+        """
         possible_cells = [
             (i, j)
             for i in range(self.size)
@@ -81,16 +92,22 @@ class Board:
         return head not in snake_body
 
     def _wrap_cell(self, point: Tuple[int, int]) -> Tuple[int, int]:
-        """Not a very useful comment.
+        """Wrap the cell.
         Args:
-            point (Tuple[int, int]): TODO
+            point (Tuple[int, int]): The cell to wrap.
         Returns:
-            Tuple[int, int]: TODO
+            Tuple[int, int]: The wrapped cell.
         """
 
         return (point[0] % self.size, point[1] % self.size)
 
-    def get_direction(self, direction):
+    def get_direction(self, direction: Action) -> Action:
+        """Get the direction.
+        Args:
+            direction (Action): The direction.
+        Returns:
+            Action: The direction.
+        """
         # Check if impossible direction
         if self.direction == Action.UP and direction == Action.DOWN:
             return self.direction
@@ -103,6 +120,12 @@ class Board:
         return direction
 
     def _get_new_head_position(self, direction: Action) -> Tuple[int, int]:
+        """Get the new head position.
+        Args:
+            direction (Action): The direction.
+        Returns:
+            Tuple[int, int]: The new head position.
+        """
         self.direction = self.get_direction(direction)
 
         # Determine head coords
@@ -162,6 +185,10 @@ class SnakeGame:
         self.board = Board(BOARD_SIZE, seed)
 
     def initialise(self) -> Tuple[List[Tuple[int, int]], Tuple[int, int]]:
+        """Initialise the game.
+        Returns:
+            Tuple[List[Tuple[int, int]], Tuple[int, int]]: The coorinates of the snake and fruit.
+        """
         self.board.spawn_snake(SPAWNING_CELLS)
         fruit = self.board.spawn_fruit()
 
