@@ -20,18 +20,18 @@ pip install -U doxa-cli
   - `submission/agent.py`: this is where you should implement your own agent!
   - `submission/doxa.yaml`: this is a configuration file used by DOXA to handle your submission
   - `submission/snake.py/`: this is the Snake game engine which enables you to submit your agent to DOXA
-- `game.py': a local version of the Snake game engine
+- `game.py`: a local version of the Snake game engine
 - `cli.py`: a CLI for playing against your own Snake agent (run with `python cli.py`)
 
 ## Snake rules
 
-For this competition, we use a 10 &times; 10 board. At the start, the snake will start at 4 cells long in the top left corner, moving right. A fruit will be randomly placed on the board as well. The goal of the game is to have the snake eat as many fruit, growing a cell each time, as it can before it runs into its own tail! The game ends when either the board is full (wow!) or you make an illegal move into your own tail. In this version of the game, the edges of the board wrap around, so you can't die from running into a wall.
+For this competition, we start with a 4 cell long snake in the top left corner of a 10 &times; 10 board, moving right. A fruit will be randomly placed on the board as well. The goal of the game is to have the snake eat as many fruit, growing a cell each time, as it can before it runs into its own tail! The game ends when either the board is full (wow!) or you make an illegal move into your own tail. In this version of the game, the edges of the board wrap around, so you can't die from running into a wall.
 
 ## Implementing an agent
 
 First, clone this repository if you have not already done so. You can then start implementing your first agent by modifying the `Agent` class in `submission/agent.py`.
 
-The only method in the `Agent` class that you have to change is `make_move()`
+The only method in the `Agent` class that you have to change is `make_move()`.
 
 ### `make_move()` method
 
@@ -48,10 +48,10 @@ class Action(IntEnum):
 `make_move()` should return one of the four possible directions.
 
 ```py
-Action.UP
+Action.UP or Action.RIGHT or Action.DOWN or Action.LEFT
 ```
 
-In order to determine which direction you want to move, you have access to the current Snake game board. The board parameter within 'make_move()' is a 2D array of 'CellStates'. The `CellState` enumerate contains all the possible states each cell can be in.
+In order to determine which direction to move, you have access to the current Snake game board. The board parameter within 'make_move()' is a 2D array of 'CellStates'. The `CellState` enumerate contains all the possible states each cell can be in.
 
 ```py
 class CellState(IntEnum):
