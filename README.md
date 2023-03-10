@@ -19,13 +19,13 @@ pip install -U doxa-cli
 - `submission/`: the directory that gets uploaded to DOXA
   - `submission/agent.py`: this is where you should implement your own agent!
   - `submission/doxa.yaml`: this is a configuration file used by DOXA to handle your submission
-  - `submission/snake.py/`: this is the Snake game engine which enables you to submit your agent to DOXA
+  - `submission/snake.py`: this is supporting code so that your agent can run on DOXA
 - `game.py`: a local version of the Snake game engine
 - `cli.py`: a CLI for playing against your own Snake agent (run with `python cli.py`)
 
 ## Snake rules
 
-For this competition, we start with a 4 cell long snake in the top left corner of a 10 &times; 10 board, moving right. A fruit will be randomly placed on the board as well. The goal of the game is to have the snake eat as many fruit, growing a cell each time, as it can before it runs into its own tail! The game ends when either the board is full (wow!) or you make an illegal move into your own tail. In this version of the game, the edges of the board wrap around, so you can't die from running into a wall.
+For this competition, we start with a 4-cell-long snake in the top left corner of a 10 &times; 10 board, moving right. A fruit will be randomly placed on the board as well. The goal of the game is to have the snake eat as many fruit as it can, growing a cell each time, before it runs into its own tail! The game ends when either the board is full (wow!) or you make an illegal move into your own tail. In this version of the game, the edges of the board wrap around, so you cannot die from running into a wall.
 
 ## Implementing an agent
 
@@ -51,7 +51,7 @@ class Action(IntEnum):
 Action.UP or Action.RIGHT or Action.DOWN or Action.LEFT
 ```
 
-In order to determine which direction to move, you have access to the current Snake game board. The board parameter within 'make_move()' is a 2D array of 'CellStates'. The `CellState` enumerate contains all the possible states each cell can be in.
+In order to determine which direction to move, you have access to the current Snake game board. The `board` parameter within `make_move()` is a list of lists of `CellState` values. The `CellState` enum represents all the possible states each cell can be in.
 
 ```py
 class CellState(IntEnum):
@@ -61,7 +61,7 @@ class CellState(IntEnum):
     FRUIT = 3
 ```
 
-`EMPTY` means that no snake nor fruit is within that cell at that tick in the game. `TAIL` indicates that **any** part of the snakes tail which is not its head is in that cell. `HEAD` indicates the front of the snake is in that cell. `FRUIT` means that the cell contains the fruit (there is only one of these on the board at any given time).
+`EMPTY` means that no snake nor fruit is within that cell at that tick in the game. `TAIL` indicates that **any** part of the snakes tail which is not its head is in that cell. `HEAD` indicates the front of the snake is in that cell. `FRUIT` means that the cell contains the fruit. There is only piece of fruit on the board at any given time.
 
 **Note**: keep in mind that a move which is opposite of the current direction the snake is moving will be ignored (becuase otherwise the snake would instantly die), and the snake will continue moving in the direction it was previously moving.
 
@@ -69,7 +69,7 @@ By default, the agent tells the snake to move in random directions. What interes
 
 ## Running the game locally
 
-You can see how your agent (as defined in submission/agent.py) performs locally using the CLI script provided.
+You can see how your agent (as defined in `submission/agent.py`) performs locally using the CLI script provided.
 
 To launch the Snake CLI script, run the following command from the root of this repository:
 
@@ -77,7 +77,7 @@ To launch the Snake CLI script, run the following command from the root of this 
 python cli.py
 ```
 
-Note: on macOS and some flavours of Linux, use `python3` instead of `python`.
+**Note**: on macOS and some flavours of Linux, use `python3` instead of `python`.
 
 ## Submitting to DOXA
 
