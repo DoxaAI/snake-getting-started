@@ -25,6 +25,7 @@ class CellState(IntEnum):
     HEAD = 2
     FRUIT = 3
 
+
 class Board:
     def __init__(self, size, seed=None):
         self.rng = Random(seed)
@@ -68,33 +69,6 @@ class Board:
 
         return self.fruit
 
-    def has_snake_eaten_fruit(self) -> bool:
-        return self.fruit == self.snake[-1]
-
-    def level_up(self) -> None:
-        """Level up the snake.
-        This method is called when the snake eats a food tile.
-        """
-
-        # get last point direction
-        a = self.snake[0]
-        b = self.snake[1]
-
-        x, y = a[:]
-
-        if a[0] < b[0]:
-            x -= 1
-        elif a[1] < b[1]:
-            y -= 1
-        elif a[0] > b[0]:
-            x += 1
-        elif a[1] > b[1]:
-            y += 1
-
-        tail = self._wrap_cell((x, y))
-        self.snake.insert(0, tail)
-        self.board[self.snake[0][0]][self.snake[0][1]] = CellState.TAIL
-
     def is_alive(self) -> bool:
         """Check if the snake is alive.
         Returns:
@@ -128,16 +102,7 @@ class Board:
             return self.direction
         return direction
 
-    def move(self, direction: Action) -> Tuple[int, int]:
-        """Moves the snake in a particular direction one step.
-        Args:
-            direction (Action): The direction.
-        Raises:
-            GameOver: The snake tried to move into itself.
-        Returns:
-            Tuple[int, int]: The new head location.
-        """
-
+    def _get_new_head_position(self, direction: Action) -> Tuple[int, int]:
         self.direction = self.get_direction(direction)
 
         # Determine head coords
@@ -153,21 +118,43 @@ class Board:
         elif self.direction == Action.LEFT:
             y -= 1
 
-        # Wrap the board
-        head = self._wrap_cell((x, y))
+        # Wrap the board cell
+        return self._wrap_cell((x, y))
 
-        self.board[self.snake[0][0]][self.snake[0][1]] = CellState.EMPTY
+    def move(
+        self, direction: Action
+    ) -> Tuple[Tuple[int, int], Optional[Tuple[int, int]]]:
+        """Moves the snake in a particular direction one step.
+        Args:
+            direction (Action): The direction.
+        Raises:
+            GameOver: The snake tried to move into itself.
+        Returns:
+            Tuple[int, int]: The new head location.
+        """
+
+        head = self._get_new_head_position(direction)
+
+        is_eating_fruit = self.fruit == head
+
+        if not is_eating_fruit:
+            self.board[self.snake[0][0]][self.snake[0][1]] = CellState.EMPTY
+            self.snake.pop(0)
+
         self.board[self.snake[-1][0]][self.snake[-1][1]] = CellState.TAIL
         self.board[head[0]][head[1]] = CellState.HEAD
         self.snake.append(head)
-        del self.snake[0]
 
         if not self.is_alive():
             raise GameOver(
                 f"Snake died at {self.snake[-1]} and length {len(self.snake)}."
             )
 
-        return head
+        if is_eating_fruit:
+            return head, self.spawn_fruit()
+
+        return head, None
+
 
 class SnakeGame:
     def __init__(self, agent: BaseAgent, seed: Optional[int] = None) -> None:
@@ -195,16 +182,8 @@ class SnakeGame:
 
         try:
             while True:
-                fruit = None
-
                 direction = await self._request_move()
-                head = self.board.move(direction)
 
-                # check if snake eats a fruit
-                if self.board.has_snake_eaten_fruit():
-                    self.board.level_up()
-                    fruit = self.board.spawn_fruit()
-
-                yield head, fruit
+                yield self.board.move(direction)
         except GameOver:
             pass
