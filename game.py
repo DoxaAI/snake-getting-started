@@ -154,6 +154,7 @@ class Board:
             GameOver: The snake tried to move into itself.
         Returns:
             Tuple[int, int]: The new head location.
+            Optional[Tuple[int, int]]: The location of the fruit if it was eaten, None otherwise.
         """
 
         head = self._get_new_head_position(direction)
