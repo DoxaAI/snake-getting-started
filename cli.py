@@ -34,8 +34,7 @@ class SnakeCLI:
             for i in range(size):
                 print(" ".join(self.icons[c] for c in self.game.board.board[i]))
 
-            time.sleep(0.1)
-            # input("Press enter to continue...")
+            time.sleep(0.25)
 
 
 async def main():
