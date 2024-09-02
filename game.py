@@ -33,7 +33,7 @@ class Board:
             size (int): The size of the board.
             seed (int, optional): The seed for the random number generator. Defaults to None.
         """
-        
+
         self.rng = Random(seed)
         self.size = size
         self.direction = Action.RIGHT
@@ -205,7 +205,7 @@ class SnakeGame:
 
         return await self.agent.make_move(self.board.board)
 
-    async def run(self) -> None:
+    async def run(self):
         """Plays a game of snake."""
 
         try:

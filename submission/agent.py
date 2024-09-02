@@ -1,4 +1,4 @@
-import random
+from random import randrange
 from typing import List
 
 from snake import Action, BaseAgent, CellState, main
@@ -20,7 +20,7 @@ class Agent(BaseAgent):
             Action: The direction to move in.
         """
 
-        return Action(random.randrange(4))
+        return Action(randrange(4))
 
 
 if __name__ == "__main__":

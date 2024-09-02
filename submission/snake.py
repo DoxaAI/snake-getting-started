@@ -1,4 +1,5 @@
 import asyncio
+import os
 from enum import IntEnum
 from typing import List, Tuple
 
@@ -49,7 +50,7 @@ class BaseAgent:
             Action: The direction in which the snake will mvoe next. eg. Action.UP
         """
 
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class SnakeGameRunner:
@@ -59,64 +60,64 @@ class SnakeGameRunner:
             [CellState.EMPTY for j in range(BOARD_SIZE)] for i in range(BOARD_SIZE)
         ]
 
-    def _handle_initialisation(self):
-        """Handles the initialisation of the game.
-        """
-        message = input().strip()
-        assert message == "INIT"
-
-        print("OK")
-
     async def run(self):
-        """Runs the game.
-        """
-        self._handle_initialisation()
+        """Runs the game."""
 
-        while True:
-            message = input().strip().split(" ")
+        stream_directory = os.environ.get("DOXA_STREAMS")
+        with (
+            open(f"{stream_directory}/in", "r") as r,
+            open(f"{stream_directory}/out", "w") as w,
+        ):
+            assert r.readline().strip() == "INIT"
+            w.write("OK\n")
+            w.flush()
 
-            # board initialisation
-            if message[0] == "I":
-                # fruit
-                self.fruit = (int(message[1]), int(message[2]))
+            while True:
+                message = r.readline().strip().split(" ")
 
-                # initial snake position
-                points = iter(message[3:])
-                self.snake = [(int(a), int(b)) for a, b in zip(points, points)]
+                # board initialisation
+                if message[0] == "I":
+                    # fruit
+                    self.fruit = (int(message[1]), int(message[2]))
 
-                # game logic
-                self.board[self.fruit[0]][self.fruit[1]] = CellState.FRUIT
-                self.board[self.snake[0][0]][self.snake[0][1]] = CellState.HEAD
-                for cell in self.snake[1:]:
-                    self.board[cell[0]][cell[1]] = CellState.TAIL
+                    # initial snake position
+                    points = iter(message[3:])
+                    self.snake = [(int(a), int(b)) for a, b in zip(points, points)]
 
-            # request a move
-            elif message[0] == "M":
-                move = await self.agent.make_move(self.board)
-                print(move.value)
+                    # game logic
+                    self.board[self.fruit[0]][self.fruit[1]] = CellState.FRUIT
+                    self.board[self.snake[0][0]][self.snake[0][1]] = CellState.HEAD
+                    for cell in self.snake[1:]:
+                        self.board[cell[0]][cell[1]] = CellState.TAIL
 
-            # updates
-            elif message[0] == "U":
-                head_x = int(message[1])
-                head_y = int(message[2])
+                # request a move
+                elif message[0] == "M":
+                    move = await self.agent.make_move(self.board)
+                    w.write(f"{move.value}\n")
+                    w.flush()
 
-                if len(message) == 5:
-                    fruit_x = int(message[3])
-                    fruit_y = int(message[4])
+                # updates
+                elif message[0] == "U":
+                    head_x = int(message[1])
+                    head_y = int(message[2])
 
-                    self.board[fruit_x][fruit_y] = CellState.FRUIT
-                    self.fruit = (fruit_x, fruit_y)
+                    if len(message) == 5:
+                        fruit_x = int(message[3])
+                        fruit_y = int(message[4])
+
+                        self.board[fruit_x][fruit_y] = CellState.FRUIT
+                        self.fruit = (fruit_x, fruit_y)
+                    else:
+                        self.board[self.snake[0][0]][self.snake[0][1]] = CellState.EMPTY
+                        self.snake.pop(0)
+
+                    self.board[self.snake[-1][0]][self.snake[-1][1]] = CellState.TAIL
+                    self.board[head_x][head_y] = CellState.HEAD
+                    self.snake.append((head_x, head_y))
+
+                # unknown messages
                 else:
-                    self.board[self.snake[0][0]][self.snake[0][1]] = CellState.EMPTY
-                    self.snake.pop(0)
-
-                self.board[self.snake[-1][0]][self.snake[-1][1]] = CellState.TAIL
-                self.board[head_x][head_y] = CellState.HEAD
-                self.snake.append((head_x, head_y))
-
-            # unknown messages
-            else:
-                raise ValueError("Unknown command.")
+                    raise ValueError("Unknown command.")
 
 
 def main(agent: BaseAgent):
